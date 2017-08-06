@@ -33,16 +33,33 @@ let game = io.of('/game').on('connection', socket=>{
 		if (!gameRoom[gameId]) socket.emit('gameError', {errMsg: 'Error'});
 		gameRoom[gameId].player.push({
 			client: socket,
-			namee: name
+			name: name
 		});
 		socket.emit('join', {content: 'success join game: ' + gameId});
-		gameRoom[gameId].player.forEach( (player, index)=>{
-			player.client.emit('gameStart', {
-				playerId: index,
-				isHost: index == 0
-			});
-		});
+		startGame( gameRoom[gameId] )
 	});
+	socket.on('quit', data=>{
+		const {playerId, gameId} = data;
+		quitGame(gameRoom[gameId], playerId)
+	})
 })
+
+startGame = (game) => {
+	game.player.forEach( (player, index) => {
+		player.client.emit('gameStart', {
+			playerId: index,
+			isHost: index == 0
+		})
+	})
+}
+quitGame = (game, index) => {
+	console.log(`=>>>>player:${index}-${game.player[index].name}-quit game.`)
+	game.player.forEach( (player, idx) => {
+		if (idx == index) return;
+		player.client.emit('playerQuit', {
+			quitPlayer: {id: index, name: game.player[index].name}
+		})
+	})
+}
 
 console.log('=======server start======')
