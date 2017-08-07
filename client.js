@@ -8,10 +8,18 @@ client.on('create', content=>{
 client.on('join', content=>{
 	console.log(content)
 })
+client.on('playerQuit', content=>{
+	console.log(`player[$content.jd]:${content.name} quit from game.`)
+})
 client.on('gameStart', data=>{
 	const { playerId, isHost } = data;
 	global.playerId = playerId;
 	console.log('your playerId:', playerId, 'isHost: ', isHost)
+})
+client.on('gameOver', data=>{
+	console.log('=====GameOver=====');
+	console.log(data);
+	console.log('==================');
 })
 
 
