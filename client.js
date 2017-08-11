@@ -3,13 +3,17 @@ let socketIoClient = require('socket.io-client')
 
 client = socketIoClient.connect('http://localhost:8080/game')
 client.on('create', content=>{
-	console.log(content)
+	console.log(content);
+	gameId = content.gameId
+})
+client.on('findGame', data => {
+	console.log(data.data)
 })
 client.on('join', content=>{
 	console.log(content)
 })
 client.on('playerQuit', content=>{
-	console.log(`player[$content.jd]:${content.name} quit from game.`)
+	console.log(`player[${content.quitPlayer.id}]:${content.quitPlayer.name} quit from game.`)
 })
 client.on('gameStart', data=>{
 	const { playerId, isHost } = data;
@@ -20,6 +24,9 @@ client.on('gameOver', data=>{
 	console.log('=====GameOver=====');
 	console.log(data);
 	console.log('==================');
+})
+client.on('gameError', msg => {
+	console.log('onError:', msg);
 })
 
 
@@ -58,6 +65,8 @@ startListen( line => {
 			gameId,
 			playerId
 		})
+	} else if (line.startsWith('find') ) {
+		client.emit('findGame');
 	}
 })
 
